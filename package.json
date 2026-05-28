@@ -1,0 +1,20 @@
+{
+  "name": "twelve_voiceAI",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "clean": "pnpm -r clean"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.25.0",
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3"
+  }
+}
