@@ -1,0 +1,144 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: tweleve-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tweleve}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tweleve_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-tweleve_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-tweleve}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tweleve-network
+  
+  redis:
+    image: redis:7-alpine
+    container_name: tweleve-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tweleve-network
+  
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: tweleve-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-tweleve}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-tweleve_dev}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tweleve-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: tweleve-minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-tweleve}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-tweleve_dev_secret}
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tweleve-network
+
+  minio-setup:
+    image: minio/mc:latest
+    container_name: tweleve-minio-setup
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9000 $${MINIO_ACCESS_KEY} $${MINIO_SECRET_KEY};
+      mc mb myminio/$${MINIO_BUCKET} --ignore-existing;
+      mc anonymous set download myminio/$${MINIO_BUCKET}/public;
+      echo 'MinIO bucket ready.';  
+      "
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-tweleve}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-tweleve_dev_secret}
+      MINIO_BUCKET: ${MINIO_BUCKET:-tweleve-audio}
+    networks:
+      - tweleve-network
+    
+  tts:
+    build:
+      context: ./services/tts
+      dockerfile: Dockerfile
+    container_name: tweleve-tts
+    ports:
+      - "8000:8000"
+    volumes:
+      - tts-models:/app/models
+    environment:
+      TTS_LOG_LEVEL: info
+      TTS_DEFAULT_VOICE: af_heart
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'python',
+          '-c',
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')",
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    networks:
+      - tweleve-network
+
+  traefik:
+    image: traefik:v3.2
+    container_name: tweleve-traefik
+    ports:
+      - "80:80" # HTTP
+      - "8080:8080" # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Mount Docker socket for service discovery
+      - ./services/gateway/traefik.yml:/etc/traefik/traefik.yml:ro # Mount Traefik static configuration
+      - ./services/gateway/dynamic.yml:/etc/traefik/dynamic.yml:ro # Mount Traefik dynamic configuration
+    networks:
+      - tweleve-network
+
+volumes:
+  postgres-data:
+  redis-data:
+  rabbitmq-data:
+  minio-data:
+  tts-models:
+
+networks:
+  tweleve-network:
+    driver: bridge

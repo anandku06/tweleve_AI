@@ -1,0 +1,48 @@
+# Traefik HTTP configuration
+http:
+  # Define routers to route incoming requests to services based on rules
+  routers:
+    auth:
+      rule: "PathPrefix(`/api/auth`) || PathPrefix(`/api/api-keys`)" # Route requests with path starting with /api/auth or /api/api-keys to the auth service
+      entryPoints: # Define entry points for incoming traffic
+        - web
+      service: auth # Specify the service to route requests to
+      middlewares: # Define middlewares to modify requests before they reach the service
+        - strip-api
+
+    voice:
+      rule: "PathPrefix(`/api/voice`) || PathPrefix(`/api/library`)"
+      entryPoints:
+        - web
+      service: voice
+      middlewares:
+        - strip-api
+
+    worker:
+      rule: "PathPrefix(`/api/tts`)"
+      entryPoints:
+        - web
+      service: worker
+      middlewares:
+        - strip-api
+  # Define services to specify how to reach the backend services
+  services:
+    auth: # Define the auth service with load balancing settings
+      loadBalancer: # Enable load balancing for the auth service
+        servers: # Define the backend servers for the auth service
+          - url: "http://host.docker.internal:3001"
+    voice:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:3002"
+
+    worker:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:3003"
+  # Define middlewares to modify requests before they reach the services
+  middlewares:
+    strip-api: # Define a middleware to strip the /api prefix from incoming requests
+      stripPrefix:
+        prefixes: 
+          - "/api"

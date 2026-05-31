@@ -1,0 +1,21 @@
+api: # Enable the API and dashboard
+  dashboard: true
+  insecure: true # Note: Insecure mode is not recommended for production environments. Consider securing the dashboard with authentication.
+# Define entry points for incoming traffic
+entryPoints:
+  web:
+    address: ":80" # Listen on port 80 for HTTP traffic
+# Define providers to discover services and load dynamic configuration
+providers:
+  docker: # Enable Docker provider to discover services running in Docker
+    endpoint: "unix://var/run/docker.sock" # Use the Docker socket to communicate with the Docker daemon
+    exposedByDefault: false # Only expose services that are explicitly labeled for Traefik
+    network: tweleve-network # Specify the Docker network to use for service discovery
+  file: # Enable file provider to load dynamic configuration from a file
+    filename: /etc/traefik/dynamic.yml # Path to the dynamic configuration file
+    watch: true # Watch for changes in the dynamic configuration file and reload Traefik automatically
+
+log: # Configure logging settings
+  level: INFO # Set log level to INFO for general logging
+
+accessLog: {} # Enable access logs with default settings
