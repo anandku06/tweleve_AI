@@ -25,9 +25,7 @@ export const voiceGenderEnum = pgEnum("voice_gender", [
 // The "voices" table is used to store information about the voices that users create or clone. It includes details such as the voice's name, description, category, gender, and the user who created it. This table is essential for managing the different voices available in the application and associating them with their respective creators.
 export const voices = pgTable("voices", {
   id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "set null" }),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   category: voiceCategoryEnum("category").notNull().default("premade"),

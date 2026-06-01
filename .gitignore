@@ -39,3 +39,7 @@ logs/
 # Coverage
 coverage/
 .nyc_output/
+
+# migrations
+migrations/
+drizzle/
