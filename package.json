@@ -14,7 +14,8 @@
     "db:generate": "pnpm --filter @twelve/db generate",
     "db:migrate": "pnpm --filter @twelve/db migrate",
     "db:seed": "pnpm --filter @twelve/db seed",
-    "db:studio": "pnpm --filter @twelve/db studio"
+    "db:studio": "pnpm --filter @twelve/db studio",
+    "dev:auth": "pnpm --filter @twelve/auth dev"
   },
   "keywords": [],
   "author": "",

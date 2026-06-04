@@ -25,7 +25,7 @@ async function jwt(app: FastifyInstance) {
   await app.register(fjwt, {
     secret,
     sign: {
-      expiresIn: process.env.JWT_EXPIRES_IN || '15m', // default to 1 hour if not set
+      expiresIn: process.env.JWT_ACCESS_EXPIRE_IN || '15m', // default to 1 hour if not set
     },
   })
 

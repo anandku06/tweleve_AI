@@ -156,3 +156,6 @@ fastify.get('/users/:id', async (request, reply) => {
   - **fastify-helmet**: A plugin for securing your Fastify applications by setting various HTTP headers to protect against common vulnerabilities.
   - **fastify-compress**: A plugin for compressing responses in Fastify, improving performance by reducing the size of the response payloads.
     etc.
+
+#### Avvio
+- 
