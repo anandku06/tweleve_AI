@@ -1,7 +1,7 @@
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, randomBytes } from 'node:crypto'
 
 export function generateRefreshToken(): string {
-  return randomBytes(32).toString("hex"); // Generate a random 32-byte token and convert it to a hexadecimal string
+  return randomBytes(32).toString('hex') // Generate a random 32-byte token and convert it to a hexadecimal string
 }
 
 /**
@@ -10,7 +10,7 @@ export function generateRefreshToken(): string {
  * not user-chosen passwords. No need for slow hashing.
  */
 export function hashToken(token: string): string {
-  return createHash("sha256").update(token).digest("hex"); // Hash the token using SHA-256
+  return createHash('sha256').update(token).digest('hex') // Hash the token using SHA-256
 }
 
 /**
@@ -18,3 +18,16 @@ export function hashToken(token: string): string {
  * - For passwords, we use argon2, which is designed to be slow and resistant to brute-force attacks.
  * - For refresh tokens, we use SHA-256, which is fast and sufficient for hashing high-entropy random values.
  */
+
+/**
+ * generate an API key with xi_ prefix
+ * returns the full key and a short prefix for display
+ */
+
+export function generateAPIKey(): { key: string; prefix: string } {
+  const raw = randomBytes(16).toString('hex')
+  const key = `xi_${raw}`
+  const prefix = key.slice(0, 7) // 'xi_xxxx'
+
+  return { key, prefix }
+}

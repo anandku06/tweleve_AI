@@ -158,4 +158,23 @@ fastify.get('/users/:id', async (request, reply) => {
     etc.
 
 #### Avvio
-- 
+- Avvio is a JavaScript library that provides an organized system for bootstrapping plugins, primarily used by the Fastify ecosystem. It manages plugin loading order, dependency resolution, and encapsulation, allowing developers to structure complex server applications predictably and efficiently.
+
+#### Key facts
+- Language: JavaScript (Node.js environment)
+- Purpose: Plugin registration and dependency management
+- Primary user: Fastify web framework
+- License: MIT License
+- Author/maintainer: Developed and maintained by the Fastify core team
+
+**Architecture and purpose**
+Avvio acts as the foundation of Fastify’s plugin system. It defines how plugins—functions or modules enhancing framework behavior—are registered, initialized, and connected. The library enforces a clear hierarchy, so each plugin runs in isolation yet can depend on others through controlled encapsulation, avoiding naming or configuration conflicts.
+
+**Plugin lifecycle**
+Each plugin registered with Avvio follows a structured lifecycle: it is first queued, its dependencies are resolved, and then it is executed in the correct order. Callbacks and promise-based loading are supported, ensuring non-blocking initialization. Once all plugins are bootstrapped, the application signals readiness to accept requests.
+
+**Use beyond Fastify**
+While Avvio was built for Fastify, it is framework-agnostic. Any Node.js application needing modular bootstrapping or plugin orchestration can integrate it. Its encapsulation model allows safe reuse of components, making it useful in microservice toolchains or large-scale service frameworks.
+
+**Relationship to Fastify**
+Avvio provides the internal mechanism that powers Fastify’s .register() method. This modular plugin approach lets developers compose servers out of self-contained units—such as routes, hooks, or decorators—while maintaining predictable startup and teardown phases.
