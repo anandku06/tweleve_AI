@@ -15,7 +15,8 @@
     "db:migrate": "pnpm --filter @twelve/db migrate",
     "db:seed": "pnpm --filter @twelve/db seed",
     "db:studio": "pnpm --filter @twelve/db studio",
-    "dev:auth": "pnpm --filter @twelve/auth dev"
+    "dev:auth": "pnpm --filter @twelve/auth dev",
+    "dev:voice": "pnpm --filter @twelve/voice dev"
   },
   "keywords": [],
   "author": "",
