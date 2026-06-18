@@ -11,8 +11,11 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1071.0",
+    "@aws-sdk/s3-request-presigner": "^3.1071.0",
     "@fastify/cors": "^11.2.0",
     "@fastify/jwt": "^10.1.0",
+    "@fastify/multipart": "^10.0.0",
     "@twelve/db": "workspace:*",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",

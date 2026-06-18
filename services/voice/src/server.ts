@@ -6,10 +6,11 @@ dotenv.config({
 
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
+import multipart from '@fastify/multipart'
 import { jwtPlugin } from './plugins/jwt'
-import { voiceRoutes } from './routes/voice'
+import { voiceRoutes } from './routes/voices'
 import { libraryRoutes } from './routes/library'
-import { configDotenv } from 'dotenv'
+import { sampleRoutes } from './routes/samples'
 
 const PORT = Number(process.env.VOICE_SERVICE_PORT) || 3002
 const HOST = process.env.HOST || '0.0.0.0'
@@ -22,12 +23,14 @@ async function main() {
   })
 
   await app.register(cors, { origin: process.env.CORS_ORIGIN || '*' })
+  await app.register(multipart, { limits: { fileSize: 50 * 1024 * 1024 } })
   await app.register(jwtPlugin)
 
   app.get('/health', async () => ({ status: 'ok', service: 'voice' }))
 
   await app.register(voiceRoutes, { prefix: '/voices' })
   await app.register(libraryRoutes, { prefix: '/library' })
+  await app.register(sampleRoutes, { prefix: '/voices/:voiceId/samples' })
 
   await app.listen({ port: PORT, host: HOST })
 }
